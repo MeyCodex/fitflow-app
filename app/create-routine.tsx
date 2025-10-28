@@ -6,15 +6,17 @@ import { useState } from "react";
 import { useRoutineStore } from "@/src/hooks/useRoutineStore";
 import { DaySelector } from "@/src/components/DaySelector";
 import { FormInput } from "@/src/components/FormInput";
+import { useTranslation } from "react-i18next";
 
 export default function CreateRoutineModal() {
+  const { t } = useTranslation();
   const [routineName, setRoutineName] = useState("");
   const [routineDay, setRoutineDay] = useState("");
   const addRoutine = useRoutineStore((state) => state.addRoutine);
 
   const handleSave = () => {
     if (!routineName.trim()) {
-      alert("Por favor, ingresa un nombre para la rutina.");
+      alert(t("createRoutine.nameRequiredError"));
       return;
     }
     addRoutine(routineName, routineDay);
@@ -26,7 +28,7 @@ export default function CreateRoutineModal() {
       <View className="flex-1 p-6">
         <View className="flex-row justify-between items-center mb-8">
           <Text className="text-3xl font-bold text-text-dark">
-            Nueva rutina
+            {t("createRoutine.title")}
           </Text>
           <TouchableOpacity onPress={() => router.back()} className="p-2">
             <Feather name="x" size={28} color="#333333" />
@@ -35,14 +37,13 @@ export default function CreateRoutineModal() {
 
         <View className="space-y-6">
           <FormInput
-            label="Nombre de la rutina"
+            label={t("createRoutine.nameLabel")}
             value={routineName}
             onChangeText={setRoutineName}
-            placeholder="Ej: Piernas + Glúteos"
+            placeholder={t("createRoutine.namePlaceholder")}
           />
-
           <DaySelector
-            label="Día"
+            label={t("createRoutine.dayLabel")}
             selectedDay={routineDay}
             onSelectDay={setRoutineDay}
           />
@@ -51,7 +52,9 @@ export default function CreateRoutineModal() {
           onPress={handleSave}
           className="bg-primary p-4 rounded-full items-center justify-center mt-auto"
         >
-          <Text className="text-white text-lg font-bold">Guardar rutina</Text>
+          <Text className="text-white text-lg font-bold">
+            {t("createRoutine.saveButton")}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

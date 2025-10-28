@@ -1,12 +1,14 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { useState } from "react";
-import { FormInput } from "../src/components/FormInput";
-import { useRoutineStore } from "../src/hooks/useRoutineStore";
+import { FormInput } from "@/src/components/FormInput";
+import { useRoutineStore } from "@/src/hooks/useRoutineStore";
+import { useTranslation } from "react-i18next";
 
 export default function AddExerciseModal() {
+  const { t } = useTranslation();
   const { routineId } = useLocalSearchParams<{ routineId: string }>();
   const [exerciseName, setExerciseName] = useState("");
   const [reps, setReps] = useState("");
@@ -18,12 +20,13 @@ export default function AddExerciseModal() {
 
   const handleSave = () => {
     if (!exerciseName.trim() || !reps.trim()) {
-      alert("Por favor, completa el nombre y las repeticiones.");
+      alert(t("addExercise.fieldsRequiredError"));
       return;
     }
     if (!routineId) {
-      alert("Error: No se encontró la rutina.");
-      router.back();
+      Alert.alert(t("common.error"), t("addExercise.routineNotFoundError"), [
+        { text: t("common.ok"), onPress: () => router.back() },
+      ]);
       return;
     }
     addExerciseToRoutine(routineId, {
@@ -32,7 +35,6 @@ export default function AddExerciseModal() {
       urlVideo: videoUrl,
     });
 
-    console.log("Ejercicio guardado en rutina:", routineId);
     router.back();
   };
 
@@ -41,7 +43,7 @@ export default function AddExerciseModal() {
       <View className="flex-1 p-6">
         <View className="flex-row justify-between items-center mb-8">
           <Text className="text-3xl font-bold text-text-dark">
-            Nuevo Ejercicio
+            {t("addExercise.title")}
           </Text>
           <TouchableOpacity onPress={() => router.back()} className="p-2">
             <Feather name="x" size={28} color="#333333" />
@@ -49,29 +51,33 @@ export default function AddExerciseModal() {
         </View>
         <View className="space-y-6">
           <FormInput
-            label="Nombre del ejercicio"
+            label={t("addExercise.nameLabel")}
             value={exerciseName}
             onChangeText={setExerciseName}
-            placeholder="Ej: Sentadillas"
+            placeholder={t("addExercise.namePlaceholder")}
           />
           <FormInput
-            label="Repeticiones"
+            label={t("addExercise.repsLabel")}
             value={reps}
             onChangeText={setReps}
-            placeholder="Ej: 3x12"
+            placeholder={t("addExercise.repsPlaceholder")}
           />
           <FormInput
-            label="URL de Video (YouTube)"
+            label={t("addExercise.videoUrlLabel")}
             value={videoUrl}
             onChangeText={setVideoUrl}
-            placeholder="https://www.youtube.com/watch?v=..."
+            placeholder={t("addExercise.videoUrlPlaceholder")}
+            keyboardType="url"
+            autoCapitalize="none"
           />
         </View>
         <TouchableOpacity
           onPress={handleSave}
           className="bg-primary p-4 rounded-full items-center justify-center mt-auto"
         >
-          <Text className="text-white text-lg font-bold">Añadir ejercicio</Text>
+          <Text className="text-white text-lg font-bold">
+            {t("addExercise.saveButton")}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

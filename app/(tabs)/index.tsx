@@ -1,6 +1,6 @@
 import { Text, View, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRoutineStore } from "@/src/hooks/useRoutineStore";
+import { useRoutineStore, Routine } from "@/src/hooks/useRoutineStore";
 import { RoutineCard } from "@/src/components/RoutineCard";
 import { Link } from "expo-router";
 import { DAYS_OF_WEEK_ES } from "@/src/constants/date";
@@ -66,13 +66,13 @@ export default function HomeScreen() {
               ) : (
                 <View className="bg-card p-4 rounded-lg items-center mb-4">
                   <Text className="text-text-light">
-                    No hay rutina asignada para hoy.
+                    {t("home.noRoutineToday")}
                   </Text>
                 </View>
               )}
               {otherRoutines.length > 0 && (
-                <Text className="text-xl font-bold text-text-dark mt-6">
-                  Próximas rutinas
+                <Text className="text-xl font-bold text-text-dark mt-6 mb-3">
+                  {t("home.nextRoutines")}
                 </Text>
               )}
             </View>
@@ -81,10 +81,10 @@ export default function HomeScreen() {
             todayRoutines.length === 0 ? (
               <View className="items-center justify-center p-10 mt-10">
                 <Text className="text-lg text-text-light">
-                  No tienes rutinas creadas.
+                  {t("home.noRoutinesCreated")}
                 </Text>
                 <Text className="text-lg text-text-light">
-                  ¡Presiona "+" para empezar!
+                  {t("home.pressAdd")}
                 </Text>
               </View>
             ) : null

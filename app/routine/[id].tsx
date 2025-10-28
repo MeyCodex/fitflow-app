@@ -2,9 +2,10 @@ import { View, Text, FlatList, TouchableOpacity, Alert } from "react-native";
 import { useLocalSearchParams, router, useNavigation } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
-import { useLayoutEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import colors from "tailwindcss/colors";
 import { Exercise, useRoutineStore } from "@/src/hooks/useRoutineStore";
+import { useTranslation } from "react-i18next";
 
 type ExerciseRowProps = {
   item: Exercise;
@@ -40,6 +41,7 @@ function ExerciseRow({ item, routineId, onDelete }: ExerciseRowProps) {
 }
 
 export default function RoutineDetailScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const deleteRoutine = useRoutineStore((state) => state.deleteRoutine);
   const deleteExercise = useRoutineStore((state) => state.deleteExercise);
@@ -70,6 +72,14 @@ export default function RoutineDetailScreen() {
     }
   }, [navigation, routine]);
 
+  useEffect(() => {
+    if (!routine && router.canGoBack()) {
+      requestAnimationFrame(() => {
+        if (router.canGoBack()) router.back();
+      });
+    }
+  }, [routine]);
+
   if (!routine) return null;
 
   const handleAddExercise = () => {
@@ -81,12 +91,12 @@ export default function RoutineDetailScreen() {
 
   const handleDeleteExerciseWithAlert = (exerciseId: string) => {
     Alert.alert(
-      "Eliminar ejercicio",
-      "¿Estás segura de que quieres eliminar este ejercicio?",
+      t("routineDetail.confirmDeleteExerciseTitle"),
+      t("routineDetail.confirmDeleteExerciseMessage"),
       [
-        { text: "Cancelar", style: "cancel" },
+        { text: t("routineDetail.cancelButton"), style: "cancel" },
         {
-          text: "Eliminar",
+          text: t("routineDetail.deleteButton"),
           style: "destructive",
           onPress: () => deleteExercise(routine.id, exerciseId),
         },
@@ -96,12 +106,12 @@ export default function RoutineDetailScreen() {
 
   const handleDeleteRoutine = () => {
     Alert.alert(
-      "Eliminar rutina",
-      `¿Estás segura de que quieres eliminar la rutina "${routine.name}"? Esta acción no se puede deshacer.`,
+      t("routineDetail.confirmDeleteRoutineTitle"),
+      t("routineDetail.confirmDeleteRoutineMessage", { name: routine.name }),
       [
-        { text: "Cancelar", style: "cancel" },
+        { text: t("routineDetail.cancelButton"), style: "cancel" },
         {
-          text: "Eliminar",
+          text: t("routineDetail.deleteButton"),
           style: "destructive",
           onPress: () => {
             deleteRoutine(routine.id);
@@ -132,10 +142,14 @@ export default function RoutineDetailScreen() {
         ListHeaderComponent={() => (
           <View className="mb-4">
             <Text className="text-xl font-semibold text-text-dark">
-              Día: {routine.day || "Sin asignar"}
+              {t("routineDetail.dayLabel", {
+                day: routine.day || t("routineDetail.noDayAssigned"),
+              })}
             </Text>
             <Text className="text-lg text-text-light mb-4">
-              {routine.exercises.length} ejercicios
+              {t("routineDetail.exercisesCount", {
+                count: routine.exercises.length,
+              })}
             </Text>
             <TouchableOpacity
               onPress={handleAddExercise}
@@ -143,7 +157,7 @@ export default function RoutineDetailScreen() {
             >
               <Feather name="plus" size={20} color="#333" />
               <Text className="text-text-dark text-base font-bold ml-2">
-                Añadir ejercicio
+                {t("routineDetail.addExercise")}
               </Text>
             </TouchableOpacity>
           </View>
@@ -156,14 +170,14 @@ export default function RoutineDetailScreen() {
             >
               <Feather name="trash" size={20} color="#EF4444" />
               <Text className="text-red-600 text-base font-bold ml-2">
-                Eliminar rutina
+                {t("routineDetail.deleteRoutine")}
               </Text>
             </TouchableOpacity>
           </View>
         )}
         ListEmptyComponent={() => (
           <Text className="text-center text-text-light mt-4">
-            No hay ejercicios. ¡Añade el primero!
+            {t("routineDetail.noExercises")}
           </Text>
         )}
         contentContainerClassName="p-6"
@@ -181,7 +195,7 @@ export default function RoutineDetailScreen() {
             className="bg-primary p-4 rounded-full items-center justify-center"
           >
             <Text className="text-white text-lg font-bold">
-              Comenzar rutina
+              {t("routineDetail.startRoutine")}
             </Text>
           </TouchableOpacity>
         </View>

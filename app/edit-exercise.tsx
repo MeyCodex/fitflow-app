@@ -5,8 +5,10 @@ import { Feather } from "@expo/vector-icons";
 import { useState, useEffect } from "react";
 import { FormInput } from "@/src/components/FormInput";
 import { useRoutineStore } from "@/src/hooks/useRoutineStore";
+import { useTranslation } from "react-i18next";
 
 export default function EditExerciseModal() {
+  const { t } = useTranslation();
   const { routineId, exerciseId } = useLocalSearchParams<{
     routineId: string;
     exerciseId: string;
@@ -20,17 +22,18 @@ export default function EditExerciseModal() {
   const [exerciseName, setExerciseName] = useState(exercise?.name || "");
   const [reps, setReps] = useState(exercise?.reps || "");
   const [videoUrl, setVideoUrl] = useState(exercise?.urlVideo || "");
+
   useEffect(() => {
     if (!exercise && routineId && exerciseId) {
-      Alert.alert("Error", "No se encontró el ejercicio para editar.", [
-        { text: "OK", onPress: () => router.back() },
+      Alert.alert(t("common.error"), t("editExercise.notFoundError"), [
+        { text: t("common.ok"), onPress: () => router.back() },
       ]);
     }
-  }, [exercise, routineId, exerciseId]);
+  }, [exercise, routineId, exerciseId, t]);
 
   const handleSave = () => {
     if (!exerciseName.trim() || !reps.trim()) {
-      alert("Por favor, completa el nombre y las repeticiones.");
+      alert(t("addExercise.fieldsRequiredError"));
       return;
     }
     if (!routineId || !exerciseId) return;
@@ -39,9 +42,9 @@ export default function EditExerciseModal() {
       reps: reps,
       urlVideo: videoUrl,
     });
-
     router.back();
   };
+
   if (!exercise) {
     return null;
   }
@@ -51,7 +54,7 @@ export default function EditExerciseModal() {
       <View className="flex-1 p-6">
         <View className="flex-row justify-between items-center mb-8">
           <Text className="text-3xl font-bold text-text-dark">
-            Editar ejercicio
+            {t("editExercise.title")}
           </Text>
           <TouchableOpacity onPress={() => router.back()} className="p-2">
             <Feather name="x" size={28} color="#333333" />
@@ -59,29 +62,31 @@ export default function EditExerciseModal() {
         </View>
         <View className="space-y-6">
           <FormInput
-            label="Nombre del ejercicio"
+            label={t("addExercise.nameLabel")}
             value={exerciseName}
             onChangeText={setExerciseName}
-            placeholder="Ej: Sentadillas"
+            placeholder={t("addExercise.namePlaceholder")}
           />
           <FormInput
-            label="Repeticiones"
+            label={t("addExercise.repsLabel")}
             value={reps}
             onChangeText={setReps}
-            placeholder="Ej: 3x12"
+            placeholder={t("addExercise.repsPlaceholder")}
           />
           <FormInput
-            label="URL de video (YouTube)"
+            label={t("addExercise.videoLabel")}
             value={videoUrl}
             onChangeText={setVideoUrl}
-            placeholder="https://www.youtube.com/watch?v=..."
+            placeholder={t("addExercise.videoPlaceholder")}
           />
         </View>
         <TouchableOpacity
           onPress={handleSave}
           className="bg-primary p-4 rounded-full items-center justify-center mt-auto"
         >
-          <Text className="text-white text-lg font-bold">Guardar cambios</Text>
+          <Text className="text-white text-lg font-bold">
+            {t("editExercise.saveButton")}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

@@ -2,8 +2,11 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { Feather } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 
 export default function RoutineCompletedScreen() {
+  const { t } = useTranslation();
+
   const handleGoHome = () => {
     router.replace("/(tabs)");
   };
@@ -14,11 +17,11 @@ export default function RoutineCompletedScreen() {
         <Feather name="check-circle" size={100} color="white" />
 
         <Text className="text-5xl font-bold text-white mt-8 mb-4">
-          ¡Felicidades!
+          {t("routineCompleted.title")}
         </Text>
 
         <Text className="text-2xl text-white text-center mb-16">
-          Has completado tu rutina.
+          {t("routineCompleted.message")}
         </Text>
 
         <TouchableOpacity
@@ -26,7 +29,7 @@ export default function RoutineCompletedScreen() {
           className="bg-card p-4 rounded-full items-center justify-center mt-auto w-full"
         >
           <Text className="text-primary text-lg font-bold">
-            Volver al inicio
+            {t("routineCompleted.goHomeButton")}
           </Text>
         </TouchableOpacity>
       </View>

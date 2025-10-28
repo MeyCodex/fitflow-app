@@ -32,10 +32,58 @@
     "nameRequiredError": "Por favor, ingresa un nombre para la rutina."
   },
   "editRoutine": {
-    "title": "Editar rutina",
-    "saveButton": "Guardar cambios"
+    "title": "Editar Rutina",
+    "saveButton": "Guardar cambios",
+    "notFoundError": "No se encontró la rutina para editar."
+  },
+  "addExercise": {
+    "title": "Nuevo ejercicio",
+    "nameLabel": "Nombre del ejercicio",
+    "namePlaceholder": "Ej: Sentadillas",
+    "repsLabel": "Repeticiones",
+    "repsPlaceholder": "Ej: 3x12",
+    "videoUrlLabel": "URL de video (YouTube)",
+    "videoUrlPlaceholder": "https://www.youtube.com/watch?v=...",
+    "saveButton": "Añadir ejercicio",
+    "fieldsRequiredError": "Por favor, completa el nombre y las repeticiones.",
+    "routineNotFoundError": "Error: No se encontró la rutina."
+  },
+  "editExercise": {
+    "title": "Editar Ejercicio",
+    "saveButton": "Guardar cambios",
+    "notFoundError": "No se encontró el ejercicio para editar."
+  },
+  "execute": {
+    "title": "Ejercicio {{current}} de {{total}}",
+    "stopButton": "Detener",
+    "noVideo": "No hay video",
+    "nextButton": "Siguiente ejercicio",
+    "finishButton": "Finalizar rutina"
+  },
+  "routineCompleted": {
+    "title": "¡Felicidades!",
+    "message": "Has completado tu rutina.",
+    "goHomeButton": "Volver al inicio"
+  },
+  "stats": {
+    "title": "Estadísticas",
+    "comingSoon": "Próximamente..."
+  },
+  "routineCard": {
+    "exercisesCount": "{{count}} ejercicios"
+  },
+  "tabs": {
+    "index": "Rutinas",
+    "stats": "Estadísticas",
+    "addRoutine": "Añadir rutina"
+  },
+  "daySelector": {
+    "selectPlaceholder": "Selecciona un día"
   },
   "common": {
+    "optional": "Opcional",
+    "error": "Error",
+    "ok": "OK",
     "today": "Hoy"
   }
 }

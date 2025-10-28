@@ -4,12 +4,17 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import colors from "tailwindcss/colors";
 import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export function CustomTabBar({
   state,
   descriptors,
   navigation,
 }: BottomTabBarProps) {
+  const { t } = useTranslation();
+  const { bottom } = useSafeAreaInsets();
+
   return (
     <View
       className="flex-row bg-card"
@@ -18,7 +23,8 @@ export function CustomTabBar({
         bottom: 0,
         left: 0,
         right: 0,
-        height: 60,
+        height: 60 + bottom,
+        paddingBottom: bottom,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: -2 },
         shadowOpacity: 0.1,
@@ -29,20 +35,23 @@ export function CustomTabBar({
       <View className="flex-1 flex-row relative">
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
-          const label =
-            options.title !== undefined ? options.title : route.name;
+          const accessibilityLabel =
+            options.tabBarAccessibilityLabel ??
+            t(`tabs.${route.name}`, { defaultValue: route.name });
           const isFocused = state.index === index;
           if (route.name === "add-routine") {
             return (
               <TouchableOpacity
                 key={route.key}
+                accessibilityRole="button"
+                accessibilityLabel={t("tabs.addRoutine")}
                 onPress={() => {
                   router.push("/create-routine");
                 }}
                 className="w-16 h-16 bg-primary rounded-full justify-center items-center shadow-xl"
                 style={{
                   position: "absolute",
-                  bottom: 20,
+                  bottom: 20 + bottom,
                   left: "50%",
                   marginLeft: -32,
                   shadowColor: "#000",
@@ -59,12 +68,13 @@ export function CustomTabBar({
           const iconName =
             route.name === "index" ? "sports-gymnastics" : "stacked-line-chart";
           const iconColor = isFocused ? colors.green[600] : colors.gray[400];
+
           return (
             <TouchableOpacity
               key={route.key}
               accessibilityRole="button"
               accessibilityState={isFocused ? { selected: true } : {}}
-              accessibilityLabel={options.tabBarAccessibilityLabel}
+              accessibilityLabel={accessibilityLabel}
               onPress={() => {
                 const event = navigation.emit({
                   type: "tabPress",

@@ -1,16 +1,7 @@
 import { View, Text } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-
-const days = [
-  { label: "Selecciona un día", value: "" },
-  { label: "Lunes", value: "Lunes" },
-  { label: "Martes", value: "Martes" },
-  { label: "Miércoles", value: "Miércoles" },
-  { label: "Jueves", value: "Jueves" },
-  { label: "Viernes", value: "Viernes" },
-  { label: "Sábado", value: "Sábado" },
-  { label: "Domingo", value: "Domingo" },
-];
+import { useTranslation } from "react-i18next";
+import { DAYS_OF_WEEK_ES } from "@/src/constants/date";
 
 type DaySelectorProps = {
   label: string;
@@ -23,6 +14,14 @@ export function DaySelector({
   selectedDay,
   onSelectDay,
 }: DaySelectorProps) {
+  const { t } = useTranslation();
+
+  const pickerItems = [
+    { label: t("daySelector.selectPlaceholder"), value: "" },
+    ...DAYS_OF_WEEK_ES.slice(1).map((day) => ({ label: day, value: day })),
+    { label: DAYS_OF_WEEK_ES[0], value: DAYS_OF_WEEK_ES[0] },
+  ];
+
   return (
     <View>
       <Text className="text-base text-text-light mb-2">{label}</Text>
@@ -36,7 +35,7 @@ export function DaySelector({
           }}
           dropdownIconColor="#333333"
         >
-          {days.map((day) => (
+          {pickerItems.map((day) => (
             <Picker.Item key={day.value} label={day.label} value={day.value} />
           ))}
         </Picker>
