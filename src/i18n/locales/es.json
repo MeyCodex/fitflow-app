@@ -1,0 +1,41 @@
+{
+  "home": {
+    "title": "Mis Rutinas",
+    "greeting": "¡Hola, lista para entrenar!",
+    "today": "Hoy: {{day}}",
+    "noRoutineToday": "No hay rutina asignada para hoy.",
+    "nextRoutines": "Próximas rutinas",
+    "noRoutinesCreated": "No tienes rutinas creadas.",
+    "pressAdd": "¡Presiona \"+\" para empezar!"
+  },
+  "routineDetail": {
+    "dayLabel": "Día: {{day}}",
+    "noDayAssigned": "Sin asignar",
+    "exercisesCount": "{{count}} ejercicios",
+    "addExercise": "Añadir ejercicio",
+    "deleteRoutine": "Eliminar rutina",
+    "startRoutine": "Comenzar rutina",
+    "noExercises": "No hay ejercicios. ¡Añade el primero!",
+    "confirmDeleteExerciseTitle": "Eliminar ejercicio",
+    "confirmDeleteExerciseMessage": "¿Estás segura de que quieres eliminar este ejercicio?",
+    "confirmDeleteRoutineTitle": "Eliminar rutina",
+    "confirmDeleteRoutineMessage": "¿Estás segura de que quieres eliminar la rutina \"{{name}}\"? Esta acción no se puede deshacer.",
+    "deleteButton": "Eliminar",
+    "cancelButton": "Cancelar"
+  },
+  "createRoutine": {
+    "title": "Nueva rutina",
+    "nameLabel": "Nombre de la rutina",
+    "namePlaceholder": "Ej: Piernas + Glúteos",
+    "dayLabel": "Día",
+    "saveButton": "Guardar rutina",
+    "nameRequiredError": "Por favor, ingresa un nombre para la rutina."
+  },
+  "editRoutine": {
+    "title": "Editar rutina",
+    "saveButton": "Guardar cambios"
+  },
+  "common": {
+    "today": "Hoy"
+  }
+}

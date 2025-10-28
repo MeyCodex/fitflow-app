@@ -1,0 +1,62 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native Build/Signing (NEVER commit these)
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.pem
+*.apk
+*.aab
+*.ipa
+*.zip
+*.tar.gz
+
+# Metro Bundler
+.metro-health-check*
+
+# Debugging logs
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+
+# Environment variables (NEVER commit secrets)
+.env
+.env*.local
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Editor directories and files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Test Coverage
+coverage/
+
+# Misc
+app-example
+
+# Generated native folders (CRITICAL FOR EXPO MANAGED)
+/ios
+/android
