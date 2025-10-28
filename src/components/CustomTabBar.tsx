@@ -23,8 +23,7 @@ export function CustomTabBar({
         bottom: 0,
         left: 0,
         right: 0,
-        height: 60 + bottom,
-        paddingBottom: bottom,
+        height: 60,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: -2 },
         shadowOpacity: 0.1,
@@ -39,6 +38,7 @@ export function CustomTabBar({
             options.tabBarAccessibilityLabel ??
             t(`tabs.${route.name}`, { defaultValue: route.name });
           const isFocused = state.index === index;
+
           if (route.name === "add-routine") {
             return (
               <TouchableOpacity
@@ -51,11 +51,11 @@ export function CustomTabBar({
                 className="w-16 h-16 bg-primary rounded-full justify-center items-center shadow-xl"
                 style={{
                   position: "absolute",
-                  bottom: 20 + bottom,
+                  bottom: 20,
                   left: "50%",
                   marginLeft: -32,
                   shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 4 },
+                  shadowOffset: { width: 0, height: 5 },
                   shadowOpacity: 0.3,
                   shadowRadius: 5,
                   elevation: 8,
@@ -65,6 +65,7 @@ export function CustomTabBar({
               </TouchableOpacity>
             );
           }
+
           const iconName =
             route.name === "index" ? "sports-gymnastics" : "stacked-line-chart";
           const iconColor = isFocused ? colors.green[600] : colors.gray[400];
