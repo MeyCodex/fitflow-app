@@ -4,6 +4,8 @@ import { Stack } from "expo-router";
 import { useEffect } from "react";
 import * as SplashScreen from "expo-splash-screen";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -13,34 +15,13 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="routine/[id]" options={{ headerShown: true }} />
-        <Stack.Screen name="execute/[id]" options={{ headerShown: true }} />
-        <Stack.Screen
-          name="create-routine"
-          options={{ presentation: "modal", headerShown: false }}
-        />
-        <Stack.Screen
-          name="add-exercise"
-          options={{ presentation: "modal", headerShown: false }}
-        />
-        <Stack.Screen
-          name="edit-routine"
-          options={{ presentation: "modal", headerShown: false }}
-        />
-        <Stack.Screen
-          name="edit-exercise"
-          options={{
-            presentation: "modal",
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="routine-completed"
-          options={{ presentation: "fullScreenModal", headerShown: false }}
-        />
-      </Stack>
+      <SafeAreaProvider>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="(app)" />
+          <Stack.Screen name="(modals)" />
+        </Stack>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
