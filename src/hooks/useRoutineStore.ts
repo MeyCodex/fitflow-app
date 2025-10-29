@@ -18,11 +18,6 @@ export interface Routine {
   exercises: Exercise[];
 }
 
-interface RoutineState {
-  routines: Routine[];
-  addRoutine: (name: string, day: string) => void;
-}
-
 type NewExerciseData = {
   name: string;
   reps: string;
