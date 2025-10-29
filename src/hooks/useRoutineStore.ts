@@ -3,37 +3,13 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { v4 as uuidv4 } from "uuid";
-
-export interface Exercise {
-  id: string;
-  name: string;
-  reps: string;
-  urlVideo: string;
-}
-
-export interface Routine {
-  id: string;
-  name: string;
-  day: string;
-  exercises: Exercise[];
-}
-
-type NewExerciseData = {
-  name: string;
-  reps: string;
-  urlVideo?: string;
-};
-
-type UpdateRoutineData = {
-  name?: string;
-  day?: string;
-};
-
-type UpdateExerciseData = {
-  name?: string;
-  reps?: string;
-  urlVideo?: string;
-};
+import {
+  Routine,
+  Exercise,
+  NewExerciseData,
+  UpdateRoutineData,
+  UpdateExerciseData,
+} from "@/src/types/routine";
 
 interface RoutineState {
   routines: Routine[];
@@ -146,3 +122,4 @@ export const useRoutineStore = create<RoutineState>()(
     }
   )
 );
+export { Exercise };
