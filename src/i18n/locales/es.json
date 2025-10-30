@@ -6,7 +6,8 @@
     "noRoutineToday": "No hay rutina asignada para hoy.",
     "nextRoutines": "Próximas rutinas",
     "noRoutinesCreated": "No tienes rutinas creadas.",
-    "pressAdd": "¡Presiona \"+\" para empezar!"
+    "pressAdd": "¡Presiona \"+\" para empezar!",
+    "restDay": "Día de descanso"
   },
   "routineDetail": {
     "dayLabel": "Día: {{day}}",
@@ -43,7 +44,7 @@
     "nameRequiredError": "Por favor, ingresa un nombre para la rutina."
   },
   "editRoutine": {
-    "title": "Editar Rutina",
+    "title": "Editar rutina",
     "saveButton": "Guardar cambios",
     "notFoundError": "No se encontró la rutina para editar."
   },
@@ -58,26 +59,24 @@
     "nameLabel": "Nombre del ejercicio",
     "namePlaceholder": "Ej: Sentadillas",
     "typeLabel": "Tipo de ejercicio",
-    "repsLabel": "Repeticiones",
-    "repsPlaceholder": "Ej: 3x12",
     "videoUrlLabel": "URL de video (YouTube)",
     "videoUrlPlaceholder": "https://www.youtube.com/watch?v=...",
     "saveButton": "Añadir ejercicio",
     "fieldsRequiredError": "Por favor, completa el nombre y al menos una métrica.",
     "routineNotFoundError": "Error: No se encontró la rutina.",
     "metricsSetsLabel": "Series",
-    "metricsSetsPlaceholder": "Ej: 3",
+    "metricsSetsPlaceholder": "3",
     "metricsRepsLabel": "Repeticiones",
-    "metricsRepsPlaceholder": "Ej: 8-12",
-    "metricsWeightLabel": "Peso (kg/lbs/BW)",
-    "metricsWeightPlaceholder": "Ej: 50 o BW",
-    "metricsDurationLabel": "Duración (segundos)",
-    "metricsDurationPlaceholder": "Ej: 60",
-    "metricsDistanceLabel": "Distancia (metros)",
-    "metricsDistancePlaceholder": "Ej: 1000"
+    "metricsRepsPlaceholder": "10",
+    "metricsWeightLabel": "Peso",
+    "metricsWeightPlaceholder": "50",
+    "metricsDurationLabel": "Duración",
+    "metricsDurationPlaceholder": "60",
+    "metricsDistanceLabel": "Distancia (m)",
+    "metricsDistancePlaceholder": "1000"
   },
   "editExercise": {
-    "title": "Editar Ejercicio",
+    "title": "Editar ejercicio",
     "saveButton": "Guardar cambios",
     "notFoundError": "No se encontró el ejercicio para editar."
   },
@@ -88,12 +87,10 @@
     "nextButton": "Siguiente ejercicio",
     "finishButton": "Finalizar rutina",
     "skipButton": "Saltar ejercicio",
-    "modifyButton": "Modificar rendimiento",
     "saveChangesButton": "Guardar cambios",
-    "confirmSkipTitle": "Saltar Ejercicio",
+    "confirmSkipTitle": "Saltar ejercicio",
     "confirmSkipMessage": "¿Estás segura de que quieres saltar este ejercicio?",
     "plannedMetricsTitle": "Objetivo:",
-    "actualMetricsTitle": "Realizado:",
     "confirmPerformanceTitle": "¿Cómo te fue?"
   },
   "routineCompleted": {
@@ -107,7 +104,8 @@
   },
   "routineCard": {
     "exercisesCount_one": "{{count}} ejercicio",
-    "exercisesCount_other": "{{count}} ejercicios"
+    "exercisesCount_other": "{{count}} ejercicios",
+    "completed": "Completada"
   },
   "tabs": {
     "index": "Rutinas",
@@ -137,13 +135,22 @@
   "metrics": {
     "sets": "Series",
     "reps": "Repeticiones",
-    "weight": "Peso (kg/lbs/BW)",
-    "duration": "Duración (seg)",
+    "weight": "Peso",
+    "duration": "Duración",
     "distance": "Distancia (m)",
     "setsPlaceholder": "0",
     "repsPlaceholder": "0",
     "weightPlaceholder": "0",
     "durationPlaceholder": "0",
-    "distancePlaceholder": "0"
+    "distancePlaceholder": "0",
+    "unit": "Unidad",
+    "hours": "Horas",
+    "minutes": "Minutos",
+    "seconds": "Segundos",
+    "units": {
+      "kg": "kg",
+      "lbs": "lbs",
+      "bw": "Peso corporal"
+    }
   }
 }

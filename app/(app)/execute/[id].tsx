@@ -162,7 +162,7 @@ export default function ExecuteRoutineScreen() {
       type: currentExercise.type,
       plannedMetrics: currentExercise.metrics,
       actualMetrics: actualMetrics,
-      status: "completed", // Ahora guardamos "completed" ya que este es el flujo principal
+      status: "completed",
     };
     addLogAndProceed(log);
   };
