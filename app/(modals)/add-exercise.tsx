@@ -6,7 +6,16 @@ import { ExerciseTypeSelector } from "@/src/components/ExerciseTypeSelector";
 import { useRoutineStore } from "@/src/hooks/useRoutineStore";
 import { useTranslation } from "react-i18next";
 import { ModalFormLayout } from "@/src/components/ModalFormLayout";
-import { ExerciseType, ExerciseMetrics } from "@/src/types/routine";
+import {
+  ExerciseType,
+  ExerciseMetrics,
+  WeightUnit,
+  DurationMetrics,
+} from "@/src/types/routine";
+import { WeightInput } from "@/src/components/form/WeightInput";
+import { DurationInput } from "@/src/components/form/DurationInput";
+
+const initialDuration = { hours: "", minutes: "", seconds: "" };
 
 export default function AddExerciseModal() {
   const { t } = useTranslation();
@@ -14,10 +23,12 @@ export default function AddExerciseModal() {
   const [exerciseName, setExerciseName] = useState("");
   const [exerciseType, setExerciseType] = useState<ExerciseType>("strength");
   const [videoUrl, setVideoUrl] = useState("");
+  // Métricas
   const [sets, setSets] = useState("");
   const [reps, setReps] = useState("");
   const [weight, setWeight] = useState("");
-  const [duration, setDuration] = useState("");
+  const [weightUnit, setWeightUnit] = useState<WeightUnit>("kg");
+  const [duration, setDuration] = useState<DurationMetrics>(initialDuration);
   const [distance, setDistance] = useState("");
 
   const addExerciseToRoutine = useRoutineStore(
@@ -25,12 +36,15 @@ export default function AddExerciseModal() {
   );
 
   const handleSave = () => {
+    const { hours, minutes, seconds } = duration;
+    const durationIsSet = !!(hours || minutes || seconds);
+
     const hasMetrics =
       (exerciseType === "strength" && (sets || reps || weight)) ||
-      (exerciseType === "cardio" && (duration || distance)) ||
-      (exerciseType === "stretch" && duration) ||
+      (exerciseType === "cardio" && (durationIsSet || distance)) ||
+      (exerciseType === "stretch" && durationIsSet) ||
       (exerciseType === "other" &&
-        (sets || reps || weight || duration || distance));
+        (sets || reps || weight || durationIsSet || distance));
 
     if (!exerciseName.trim() || !hasMetrics) {
       alert(t("addExercise.fieldsRequiredError"));
@@ -42,11 +56,18 @@ export default function AddExerciseModal() {
       ]);
       return;
     }
+
+    // Guardar
     const metrics: ExerciseMetrics = {};
     if (sets) metrics.sets = sets;
     if (reps) metrics.reps = reps;
-    if (weight) metrics.weight = weight;
-    if (duration) metrics.duration = parseInt(duration, 10) || 0;
+    if (weight) {
+      metrics.weight = weight;
+      metrics.weightUnit = weightUnit;
+    }
+    if (durationIsSet) {
+      metrics.duration = duration;
+    }
     if (distance) metrics.distance = parseInt(distance, 10) || 0;
 
     addExerciseToRoutine(routineId, {
@@ -94,38 +115,32 @@ export default function AddExerciseModal() {
                 onChangeText={setReps}
                 placeholder={t("addExercise.metricsRepsPlaceholder")}
               />
-              <FormInput
+              <WeightInput
                 label={t("addExercise.metricsWeightLabel")}
                 value={weight}
+                unit={weightUnit}
                 onChangeText={setWeight}
-                placeholder={t("addExercise.metricsWeightPlaceholder")}
+                onUnitChange={setWeightUnit}
               />
             </>
           )}
-          {(exerciseType === "cardio" || exerciseType === "other") && (
-            <>
-              <FormInput
-                label={t("addExercise.metricsDurationLabel")}
-                value={duration}
-                onChangeText={setDuration}
-                placeholder={t("addExercise.metricsDurationPlaceholder")}
-                keyboardType="numeric"
-              />
-              <FormInput
-                label={t("addExercise.metricsDistanceLabel")}
-                value={distance}
-                onChangeText={setDistance}
-                placeholder={t("addExercise.metricsDistancePlaceholder")}
-                keyboardType="numeric"
-              />
-            </>
-          )}
-          {exerciseType === "stretch" && (
-            <FormInput
+
+          {(exerciseType === "cardio" ||
+            exerciseType === "stretch" ||
+            exerciseType === "other") && (
+            <DurationInput
               label={t("addExercise.metricsDurationLabel")}
               value={duration}
-              onChangeText={setDuration}
-              placeholder={t("addExercise.metricsDurationPlaceholder")}
+              onChange={setDuration}
+            />
+          )}
+
+          {(exerciseType === "cardio" || exerciseType === "other") && (
+            <FormInput
+              label={t("addExercise.metricsDistanceLabel")}
+              value={distance}
+              onChangeText={setDistance}
+              placeholder={t("addExercise.metricsDistancePlaceholder")}
               keyboardType="numeric"
             />
           )}

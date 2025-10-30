@@ -7,8 +7,23 @@ import { Feather } from "@expo/vector-icons";
 import { getYouTubeVideoId } from "@/src/utils/youtube";
 import { useRoutineStore } from "@/src/hooks/useRoutineStore";
 import { useTranslation } from "react-i18next";
-import { ExerciseLog, ExerciseMetrics } from "@/src/types/routine";
+import {
+  ExerciseLog,
+  ExerciseMetrics,
+  DurationMetrics,
+} from "@/src/types/routine";
 import { ModifyMetricsModal } from "@/src/components/execute/ModifyMetricsModal";
+import { useAlertStore } from "@/src/hooks/useAlertStore";
+import { showConfirmationAlert } from "@/src/utils/alerts";
+
+const formatDuration = (duration: DurationMetrics): string | null => {
+  const { hours, minutes, seconds } = duration;
+  const timeParts: string[] = [];
+  if (hours && Number(hours) > 0) timeParts.push(`${Number(hours)}h`);
+  if (minutes && Number(minutes) > 0) timeParts.push(`${Number(minutes)}m`);
+  if (seconds && Number(seconds) > 0) timeParts.push(`${Number(seconds)}s`);
+  return timeParts.length > 0 ? timeParts.join(" ") : null;
+};
 
 const formatMetrics = (
   metrics: ExerciseMetrics | undefined,
@@ -16,14 +31,29 @@ const formatMetrics = (
 ): string => {
   if (!metrics) return "";
   const parts: string[] = [];
-  if (metrics.sets) parts.push(t("metrics.sets", { count: metrics.sets }));
-  if (metrics.reps) parts.push(t("metrics.reps", { count: metrics.reps }));
-  if (metrics.weight)
-    parts.push(t("metrics.weight", { count: metrics.weight }));
-  if (metrics.duration)
-    parts.push(t("metrics.duration", { count: metrics.duration }));
-  if (metrics.distance)
-    parts.push(t("metrics.distance", { count: metrics.distance }));
+
+  if (metrics.sets) {
+    parts.push(t("metrics.sets_other", { count: Number(metrics.sets) }));
+  }
+  if (metrics.reps) {
+    parts.push(t("metrics.reps_other", { count: Number(metrics.reps) }));
+  }
+  if (metrics.weight) {
+    const unit = metrics.weightUnit
+      ? t(`metrics.units.${metrics.weightUnit}`)
+      : "";
+    parts.push(t("metrics.weight_unit", { count: metrics.weight, unit: unit }));
+  }
+  if (metrics.duration) {
+    const durationString = formatDuration(metrics.duration);
+    if (durationString) parts.push(durationString);
+  }
+  if (metrics.distance) {
+    parts.push(
+      t("metrics.distance_other", { count: Number(metrics.distance) })
+    );
+  }
+
   return parts.join(" / ");
 };
 
@@ -82,8 +112,11 @@ export default function ExecuteRoutineScreen() {
       router.canGoBack()
     ) {
       setTimeout(() => {
-        Alert.alert(t("common.error"), "Esta rutina no tiene ejercicios.");
-        router.back();
+        useAlertStore.getState().alert({
+          title: t("common.error"),
+          message: "Esta rutina no tiene ejercicios.",
+          buttons: [{ text: t("common.ok"), onPress: () => router.back() }],
+        });
       }, 0);
     }
   }, [routine, t]);
@@ -106,6 +139,7 @@ export default function ExecuteRoutineScreen() {
 
     if (currentIndex < routine.exercises.length - 1) {
       setCurrentIndex(currentIndex + 1);
+      setIsPaused(true);
     } else {
       if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
       const endTime = new Date();
@@ -127,27 +161,22 @@ export default function ExecuteRoutineScreen() {
   };
 
   const handleSkip = () => {
-    Alert.alert(
+    showConfirmationAlert(
       t("execute.confirmSkipTitle"),
       t("execute.confirmSkipMessage"),
-      [
-        { text: t("routineDetail.cancelButton"), style: "cancel" },
-        {
-          text: t("common.ok"),
-          style: "destructive",
-          onPress: () => {
-            const log: ExerciseLog = {
-              exerciseId: currentExercise.id,
-              name: currentExercise.name,
-              type: currentExercise.type,
-              plannedMetrics: currentExercise.metrics,
-              actualMetrics: {},
-              status: "skipped",
-            };
-            addLogAndProceed(log);
-          },
-        },
-      ]
+      () => {
+        const log: ExerciseLog = {
+          exerciseId: currentExercise.id,
+          name: currentExercise.name,
+          type: currentExercise.type,
+          plannedMetrics: currentExercise.metrics,
+          actualMetrics: {},
+          status: "skipped",
+        };
+        addLogAndProceed(log);
+      },
+      t("common.skip"),
+      t("common.cancel")
     );
   };
 
@@ -166,6 +195,7 @@ export default function ExecuteRoutineScreen() {
     };
     addLogAndProceed(log);
   };
+
   const formatTime = (totalSeconds: number): string => {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
@@ -173,11 +203,10 @@ export default function ExecuteRoutineScreen() {
       .toString()
       .padStart(2, "0")}`;
   };
-
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <View className="flex-1 p-6">
-        <View className="flex-row items-center justify-center space-x-4 mb-4">
+      <View className="flex-1">
+        <View className="flex-row items-center justify-center space-x-4 pt-4 px-6">
           <Text className="text-2xl font-semibold text-text-light w-20 text-right">
             {formatTime(elapsedTime)}
           </Text>
@@ -189,8 +218,7 @@ export default function ExecuteRoutineScreen() {
             />
           </TouchableOpacity>
         </View>
-
-        <View className="w-full aspect-video rounded-lg overflow-hidden bg-text-dark mb-4">
+        <View className="w-full aspect-video rounded-lg overflow-hidden bg-text-dark my-4">
           {videoId ? (
             <YoutubePlayer play={false} videoId={videoId} height={300} />
           ) : (
@@ -199,11 +227,15 @@ export default function ExecuteRoutineScreen() {
             </View>
           )}
         </View>
-        <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-          <Text className="text-3xl font-bold text-text-dark mb-1">
+        <ScrollView
+          className="flex-1"
+          showsVerticalScrollIndicator={false}
+          contentContainerClassName="px-6 pb-6"
+        >
+          <Text className="text-3xl font-bold text-text-dark mb-4">
             {currentExercise.name}
           </Text>
-          <View className="mb-6">
+          <View className="bg-card p-4 rounded-lg mb-6 shadow-sm">
             <Text className="text-lg font-semibold text-primary mb-1">
               {t("execute.plannedMetricsTitle")}
             </Text>
@@ -211,10 +243,7 @@ export default function ExecuteRoutineScreen() {
               {formatMetrics(currentExercise.metrics, t)}
             </Text>
           </View>
-
-          {/* --- 🎨 NUEVO LAYOUT DE BOTONES (SIMPLIFICADO) --- */}
           <View className="space-y-3 mt-4">
-            {/* 1. Botón Principal (Abre el modal) */}
             <TouchableOpacity
               onPress={handleModify}
               className="bg-primary p-4 rounded-full items-center justify-center"
@@ -226,7 +255,6 @@ export default function ExecuteRoutineScreen() {
               </Text>
             </TouchableOpacity>
 
-            {/* 2. Botón Secundario (Saltar) */}
             <TouchableOpacity
               onPress={handleSkip}
               className="bg-gray-200 p-4 rounded-full items-center justify-center"
@@ -236,9 +264,7 @@ export default function ExecuteRoutineScreen() {
               </Text>
             </TouchableOpacity>
           </View>
-          {/* --- FIN LAYOUT DE BOTONES --- */}
         </ScrollView>
-
         <ModifyMetricsModal
           visible={isModifyModalVisible}
           onClose={() => setModifyModalVisible(false)}

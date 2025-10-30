@@ -1,12 +1,20 @@
 export type ExerciseType = "strength" | "cardio" | "stretch" | "other";
 export type RoutineSchedule = "morning" | "afternoon" | "evening" | "any";
 export type ExerciseLogStatus = "completed" | "skipped" | "partially_completed";
+export type WeightUnit = "kg" | "lb" | "bw";
+
+export interface DurationMetrics {
+  hours: string;
+  minutes: string;
+  seconds: string;
+}
 
 export interface ExerciseMetrics {
   sets?: number | string;
   reps?: number | string;
   weight?: number | string;
-  duration?: number;
+  weightUnit?: WeightUnit;
+  duration?: DurationMetrics;
   distance?: number;
 }
 

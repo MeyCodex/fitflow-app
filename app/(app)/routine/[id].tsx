@@ -6,22 +6,49 @@ import { useEffect, useLayoutEffect } from "react";
 import { useRoutineStore } from "@/src/hooks/useRoutineStore";
 import { useTranslation } from "react-i18next";
 import { showConfirmationAlert } from "@/src/utils/alerts";
-import { Exercise, ExerciseMetrics } from "@/src/types/routine";
+import {
+  Exercise,
+  ExerciseMetrics,
+  DurationMetrics,
+} from "@/src/types/routine";
 
+const formatDuration = (duration: DurationMetrics): string | null => {
+  const { hours, minutes, seconds } = duration;
+  const timeParts: string[] = [];
+  if (hours && Number(hours) > 0) timeParts.push(`${Number(hours)}h`);
+  if (minutes && Number(minutes) > 0) timeParts.push(`${Number(minutes)}m`);
+  if (seconds && Number(seconds) > 0) timeParts.push(`${Number(seconds)}s`);
+  return timeParts.length > 0 ? timeParts.join(" ") : null;
+};
 const formatMetrics = (
   metrics: ExerciseMetrics | undefined,
   t: any
 ): string => {
   if (!metrics) return "";
   const parts: string[] = [];
-  if (metrics.sets) parts.push(t("metrics.sets", { count: metrics.sets }));
-  if (metrics.reps) parts.push(t("metrics.reps", { count: metrics.reps }));
-  if (metrics.weight)
-    parts.push(t("metrics.weight", { count: metrics.weight }));
-  if (metrics.duration)
-    parts.push(t("metrics.duration", { count: metrics.duration }));
-  if (metrics.distance)
-    parts.push(t("metrics.distance", { count: metrics.distance }));
+
+  if (metrics.sets) {
+    parts.push(t("metrics.sets_other", { count: Number(metrics.sets) }));
+  }
+  if (metrics.reps) {
+    parts.push(t("metrics.reps_other", { count: Number(metrics.reps) }));
+  }
+  if (metrics.weight) {
+    const unit = metrics.weightUnit
+      ? t(`metrics.units.${metrics.weightUnit}`)
+      : "";
+    parts.push(t("metrics.weight_unit", { count: metrics.weight, unit: unit }));
+  }
+  if (metrics.duration) {
+    const durationString = formatDuration(metrics.duration);
+    if (durationString) parts.push(durationString);
+  }
+  if (metrics.distance) {
+    parts.push(
+      t("metrics.distance_other", { count: Number(metrics.distance) })
+    );
+  }
+
   return parts.join(" / ");
 };
 
@@ -160,7 +187,7 @@ export default function RoutineDetailScreen() {
               </Text>
             )}
             <Text className="text-lg text-text-light mb-4">
-              {t("routineDetail.exercisesCount", {
+              {t("routineDetail.exercisesCount_other", {
                 count: routine.exercises.length,
               })}
             </Text>
@@ -193,7 +220,7 @@ export default function RoutineDetailScreen() {
             {t("routineDetail.noExercises")}
           </Text>
         )}
-        contentContainerClassName="pl-6 pr-6"
+        contentContainerClassName="pl-6 pr-6 pt-4"
       />
       {routine.exercises.length > 0 && (
         <View className="p-6 border-t border-gray-200 bg-background">

@@ -1,5 +1,5 @@
-import { Alert } from "react-native";
 import i18n from "@/src/i18n/config";
+import { useAlertStore } from "@/src/hooks/useAlertStore";
 
 export function showConfirmationAlert(
   title: string,
@@ -9,16 +9,20 @@ export function showConfirmationAlert(
   cancelButtonText?: string
 ) {
   const { t } = i18n;
-
-  Alert.alert(title, message, [
-    {
-      text: cancelButtonText || t("routineDetail.cancelButton"),
-      style: "cancel",
-    },
-    {
-      text: confirmButtonText || t("routineDetail.deleteButton"),
-      style: "destructive",
-      onPress: onConfirm,
-    },
-  ]);
+  useAlertStore.getState().alert({
+    title: title,
+    message: message,
+    buttons: [
+      {
+        text: cancelButtonText || t("common.cancel"),
+        style: "cancel",
+        onPress: () => {},
+      },
+      {
+        text: confirmButtonText || t("common.delete"),
+        style: "destructive",
+        onPress: onConfirm,
+      },
+    ],
+  });
 }

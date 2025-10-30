@@ -1,7 +1,14 @@
 import { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, ScrollView, Modal } from "react-native";
-import { ExerciseMetrics, ExerciseType } from "@/src/types/routine";
+import {
+  ExerciseMetrics,
+  ExerciseType,
+  WeightUnit,
+  DurationMetrics,
+} from "@/src/types/routine";
 import { FormInput } from "@/src/components/FormInput";
+import { WeightInput } from "@/src/components/form/WeightInput";
+import { DurationInput } from "@/src/components/form/DurationInput";
 
 type ModifyMetricsModalProps = {
   visible: boolean;
@@ -12,6 +19,8 @@ type ModifyMetricsModalProps = {
   t: (key: string) => string;
 };
 
+const initialDuration = { hours: "", minutes: "", seconds: "" };
+
 export function ModifyMetricsModal({
   visible,
   onClose,
@@ -20,7 +29,6 @@ export function ModifyMetricsModal({
   onSubmit,
   t,
 }: ModifyMetricsModalProps) {
-  // El estado se inicializa con el valor planeado, o un string vacío si no existe
   const [actualSets, setActualSets] = useState(
     String(plannedMetrics?.sets || "")
   );
@@ -30,40 +38,61 @@ export function ModifyMetricsModal({
   const [actualWeight, setActualWeight] = useState(
     String(plannedMetrics?.weight || "")
   );
-  const [actualDuration, setActualDuration] = useState(
-    String(plannedMetrics?.duration || "")
+  const [actualWeightUnit, setActualWeightUnit] = useState<WeightUnit>(
+    plannedMetrics?.weightUnit || "kg"
+  );
+  const [actualDuration, setActualDuration] = useState<DurationMetrics>(
+    plannedMetrics?.duration || initialDuration
   );
   const [actualDistance, setActualDistance] = useState(
     String(plannedMetrics?.distance || "")
   );
-
+  useEffect(() => {
+    if (visible) {
+      setActualSets(String(plannedMetrics?.sets || ""));
+      setActualReps(String(plannedMetrics?.reps || ""));
+      setActualWeight(String(plannedMetrics?.weight || ""));
+      setActualWeightUnit(plannedMetrics?.weightUnit || "kg");
+      setActualDuration(plannedMetrics?.duration || initialDuration);
+      setActualDistance(String(plannedMetrics?.distance || ""));
+    }
+  }, [visible, plannedMetrics]);
   const handleSubmit = () => {
     const actualMetrics: ExerciseMetrics = {};
+    const { hours, minutes, seconds } = actualDuration;
+    const durationIsSet = !!(hours || minutes || seconds);
+    if (durationIsSet) {
+      actualMetrics.duration = actualDuration;
+    }
     if (actualSets) actualMetrics.sets = actualSets;
     if (actualReps) actualMetrics.reps = actualReps;
-    if (actualWeight) actualMetrics.weight = actualWeight;
-    if (actualDuration)
-      actualMetrics.duration = parseInt(actualDuration, 10) || undefined;
+    if (actualWeight) {
+      actualMetrics.weight = actualWeight;
+      actualMetrics.weightUnit = actualWeightUnit;
+    }
     if (actualDistance)
       actualMetrics.distance = parseInt(actualDistance, 10) || undefined;
+    const plannedDurationIsSet = !!(
+      plannedMetrics.duration &&
+      (plannedMetrics.duration.hours ||
+        plannedMetrics.duration.minutes ||
+        plannedMetrics.duration.seconds)
+    );
 
-    // --- LÓGICA DE VALIDACIÓN MEJORADA ---
-    // Si el usuario no ingresa nada (todos los campos relevantes están vacíos),
-    // asumimos que completó lo planeado.
     const plannedForType =
       (exerciseType === "strength" &&
         (plannedMetrics.sets ||
           plannedMetrics.reps ||
           plannedMetrics.weight)) ||
       (exerciseType === "cardio" &&
-        (plannedMetrics.duration || plannedMetrics.distance)) ||
-      (exerciseType === "stretch" && plannedMetrics.duration);
+        (plannedDurationIsSet || plannedMetrics.distance)) ||
+      (exerciseType === "stretch" && plannedDurationIsSet);
 
     const actualForType =
       (exerciseType === "strength" &&
         (actualSets || actualReps || actualWeight)) ||
-      (exerciseType === "cardio" && (actualDuration || actualDistance)) ||
-      (exerciseType === "stretch" && actualDuration);
+      (exerciseType === "cardio" && (durationIsSet || actualDistance)) ||
+      (exerciseType === "stretch" && durationIsSet);
 
     if (plannedForType && !actualForType) {
       alert(t("addExercise.fieldsRequiredError"));
@@ -73,22 +102,12 @@ export function ModifyMetricsModal({
     onClose();
   };
 
-  useEffect(() => {
-    if (visible) {
-      setActualSets(String(plannedMetrics?.sets || ""));
-      setActualReps(String(plannedMetrics?.reps || ""));
-      setActualWeight(String(plannedMetrics?.weight || ""));
-      setActualDuration(String(plannedMetrics?.duration || ""));
-      setActualDistance(String(plannedMetrics?.distance || ""));
-    }
-  }, [visible, plannedMetrics]);
-
   return (
     <Modal visible={visible} animationType="slide" transparent={true}>
       <View className="flex-1 justify-center items-center bg-black/50">
         <View className="bg-card w-11/12 p-6 rounded-lg shadow-lg">
           <Text className="text-xl font-bold text-text-dark mb-4">
-            {t("execute.confirmPerformanceTitle")} {/* <-- TÍTULO CAMBIADO */}
+            {t("execute.confirmPerformanceTitle")}
           </Text>
           <ScrollView>
             {(exerciseType === "strength" || exerciseType === "other") && (
@@ -108,25 +127,32 @@ export function ModifyMetricsModal({
                   placeholder={t("metrics.repsPlaceholder")}
                 />
                 <View className="h-4" />
-                <FormInput
+                <WeightInput
                   label={t("metrics.weight")}
                   value={actualWeight}
+                  unit={actualWeightUnit}
                   onChangeText={setActualWeight}
-                  placeholder={t("metrics.weightPlaceholder")}
+                  onUnitChange={setActualWeightUnit}
                 />
                 <View className="h-4" />
               </>
             )}
-            {(exerciseType === "cardio" || exerciseType === "other") && (
+
+            {(exerciseType === "cardio" ||
+              exerciseType === "stretch" ||
+              exerciseType === "other") && (
               <>
-                <FormInput
+                <DurationInput
                   label={t("metrics.duration")}
                   value={actualDuration}
-                  onChangeText={setActualDuration}
-                  keyboardType="numeric"
-                  placeholder={t("metrics.durationPlaceholder")}
+                  onChange={setActualDuration}
                 />
                 <View className="h-4" />
+              </>
+            )}
+
+            {(exerciseType === "cardio" || exerciseType === "other") && (
+              <>
                 <FormInput
                   label={t("metrics.distance")}
                   value={actualDistance}
@@ -136,15 +162,6 @@ export function ModifyMetricsModal({
                 />
                 <View className="h-4" />
               </>
-            )}
-            {exerciseType === "stretch" && (
-              <FormInput
-                label={t("metrics.duration")}
-                value={actualDuration}
-                onChangeText={setActualDuration}
-                keyboardType="numeric"
-                placeholder={t("metrics.durationPlaceholder")}
-              />
             )}
           </ScrollView>
 

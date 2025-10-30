@@ -1,6 +1,6 @@
 {
   "home": {
-    "title": "Mis Rutinas",
+    "title": "Mis rutinas",
     "greeting": "¡Hola, lista para entrenar!",
     "today": "Hoy: {{day}}",
     "noRoutineToday": "No hay rutina asignada para hoy.",
@@ -88,7 +88,7 @@
     "finishButton": "Finalizar rutina",
     "skipButton": "Saltar ejercicio",
     "saveChangesButton": "Guardar cambios",
-    "confirmSkipTitle": "Saltar ejercicio",
+    "confirmSkipTitle": "Saltar Ejercicio",
     "confirmSkipMessage": "¿Estás segura de que quieres saltar este ejercicio?",
     "plannedMetricsTitle": "Objetivo:",
     "confirmPerformanceTitle": "¿Cómo te fue?"
@@ -137,20 +137,27 @@
     "reps": "Repeticiones",
     "weight": "Peso",
     "duration": "Duración",
-    "distance": "Distancia (m)",
+    "distance": "Distancia",
+    "sets_one": "{{count}} serie",
+    "sets_other": "{{count}} series",
+    "reps_one": "{{count}} rep",
+    "reps_other": "{{count}} reps",
+    "weight_unit": "{{count}} {{unit}}",
+    "distance_one": "{{count}} metro",
+    "distance_other": "{{count}} metros",
     "setsPlaceholder": "0",
     "repsPlaceholder": "0",
     "weightPlaceholder": "0",
     "durationPlaceholder": "0",
     "distancePlaceholder": "0",
     "unit": "Unidad",
-    "hours": "Horas",
-    "minutes": "Minutos",
-    "seconds": "Segundos",
     "units": {
       "kg": "kg",
       "lbs": "lbs",
-      "bw": "Peso corporal"
-    }
+      "bw": "PC"
+    },
+    "hours": "Horas",
+    "minutes": "Minutos",
+    "seconds": "Segundos"
   }
 }
