@@ -1,24 +1,76 @@
-import { View, Text, FlatList, TouchableOpacity, Alert } from "react-native";
+import { View, Text, FlatList, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, router, useNavigation } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { useEffect, useLayoutEffect } from "react";
-import colors from "tailwindcss/colors";
-import { Exercise, useRoutineStore } from "@/src/hooks/useRoutineStore";
+import { useRoutineStore } from "@/src/hooks/useRoutineStore";
 import { useTranslation } from "react-i18next";
 import { showConfirmationAlert } from "@/src/utils/alerts";
+import { Exercise, ExerciseMetrics } from "@/src/types/routine";
+
+const formatMetrics = (
+  metrics: ExerciseMetrics | undefined,
+  t: any
+): string => {
+  if (!metrics) return "";
+  const parts: string[] = [];
+  if (metrics.sets) parts.push(t("metrics.sets", { count: metrics.sets }));
+  if (metrics.reps) parts.push(t("metrics.reps", { count: metrics.reps }));
+  if (metrics.weight)
+    parts.push(t("metrics.weight", { count: metrics.weight }));
+  if (metrics.duration)
+    parts.push(t("metrics.duration", { count: metrics.duration }));
+  if (metrics.distance)
+    parts.push(t("metrics.distance", { count: metrics.distance }));
+  return parts.join(" / ");
+};
 
 type ExerciseRowProps = {
   item: Exercise;
   routineId: string;
-  onDelete: (id: string) => void;
 };
+
+function ExerciseRow({ item, routineId }: ExerciseRowProps) {
+  const { t } = useTranslation();
+  const deleteExercise = useRoutineStore((state) => state.deleteExercise);
+
+  const handleDeleteClick = () => {
+    showConfirmationAlert(
+      t("routineDetail.confirmDeleteExerciseTitle"),
+      t("routineDetail.confirmDeleteExerciseMessage", { name: item.name }),
+      () => deleteExercise(routineId, item.id)
+    );
+  };
+
+  const handleEditClick = () => {
+    router.push({
+      pathname: "/edit-exercise",
+      params: { routineId: routineId, exerciseId: item.id },
+    });
+  };
+
+  return (
+    <View className="flex-row items-center bg-card p-4 rounded-lg">
+      <View className="flex-1">
+        <Text className="text-lg font-bold text-text-dark">{item.name}</Text>
+        <Text className="text-base text-text-light" numberOfLines={2}>
+          {formatMetrics(item.metrics, t) || t("routineDetail.noMetrics")}
+        </Text>
+      </View>
+      <TouchableOpacity onPress={handleEditClick} className="p-2 ml-2">
+        <Feather name="edit-2" size={22} color="#666666" />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={handleDeleteClick} className="p-2 ml-1">
+        <Feather name="trash-2" size={22} color="#EF4444" />
+      </TouchableOpacity>
+    </View>
+  );
+}
 
 export default function RoutineDetailScreen() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const deleteRoutine = useRoutineStore((state) => state.deleteRoutine);
-  const deleteExercise = useRoutineStore((state) => state.deleteExercise);
   const routine = useRoutineStore((state) =>
     state.routines.find((r) => r.id === id)
   );
@@ -39,7 +91,7 @@ export default function RoutineDetailScreen() {
             }
             style={{ marginRight: 15 }}
           >
-            <Feather name="edit-2" size={24} color={colors.green[600]} />
+            <Feather name="edit-2" size={24} className="text-primary" />
           </TouchableOpacity>
         ),
       });
@@ -63,17 +115,6 @@ export default function RoutineDetailScreen() {
     });
   };
 
-  const handleDeleteExerciseWithAlert = (exerciseId: string) => {
-    const exerciseName =
-      routine.exercises.find((ex) => ex.id === exerciseId)?.name ||
-      "este ejercicio";
-    showConfirmationAlert(
-      t("routineDetail.confirmDeleteExerciseTitle"),
-      t("routineDetail.confirmDeleteExerciseMessage", { name: exerciseName }),
-      () => deleteExercise(routine.id, exerciseId)
-    );
-  };
-
   const handleDeleteRoutine = () => {
     showConfirmationAlert(
       t("routineDetail.confirmDeleteRoutineTitle"),
@@ -89,53 +130,35 @@ export default function RoutineDetailScreen() {
     );
   };
 
-  function ExerciseRow({ item, routineId }: ExerciseRowProps) {
-    const handleDeleteClick = () => {
-      handleDeleteExerciseWithAlert(item.id);
-    };
-    const handleEditClick = () => {
-      router.push({
-        pathname: "/edit-exercise",
-        params: { routineId: routineId, exerciseId: item.id },
-      });
-    };
-
-    return (
-      <View className="flex-row items-center bg-card p-4 rounded-lg">
-        <View className="flex-1">
-          <Text className="text-lg font-bold text-text-dark">{item.name}</Text>
-          <Text className="text-base text-text-light">{item.reps}</Text>
-        </View>
-        <TouchableOpacity onPress={handleEditClick} className="p-2 ml-2">
-          <Feather name="edit-2" size={22} color={colors.gray[500]} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleDeleteClick} className="p-2 ml-1">
-          <Feather name="trash-2" size={22} color="#EF4444" />
-        </TouchableOpacity>
-      </View>
-    );
-  }
+  const displayDays =
+    routine.days.length > 0
+      ? routine.days.join(", ")
+      : t("routineDetail.noDayAssigned");
+  const displaySchedule =
+    routine.schedule && routine.schedule !== "any"
+      ? t("scheduleSelector." + routine.schedule)
+      : "";
 
   return (
     <SafeAreaView className="flex-1 bg-background">
       <FlatList
+        className="flex-1"
         data={routine.exercises}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <ExerciseRow
-            item={item}
-            routineId={routine.id}
-            onDelete={handleDeleteExerciseWithAlert}
-          />
+          <ExerciseRow item={item} routineId={routine.id} />
         )}
         ItemSeparatorComponent={() => <View className="h-3" />}
         ListHeaderComponent={() => (
           <View className="mb-4">
             <Text className="text-xl font-semibold text-text-dark">
-              {t("routineDetail.dayLabel", {
-                day: routine.day || t("routineDetail.noDayAssigned"),
-              })}
+              {t("routineDetail.daysLabel")}: {displayDays}
             </Text>
+            {displaySchedule && (
+              <Text className="text-lg text-text-light">
+                {t("routineDetail.scheduleLabel")}: {displaySchedule}
+              </Text>
+            )}
             <Text className="text-lg text-text-light mb-4">
               {t("routineDetail.exercisesCount", {
                 count: routine.exercises.length,
@@ -156,10 +179,10 @@ export default function RoutineDetailScreen() {
           <View className="mt-10 mb-20">
             <TouchableOpacity
               onPress={handleDeleteRoutine}
-              className="flex-row items-center justify-center bg-red-100 p-3 rounded-lg"
+              className="flex-row items-center justify-center bg-danger-light p-3 rounded-lg"
             >
               <Feather name="trash-2" size={22} color="#EF4444" />
-              <Text className="text-red-600 text-base font-bold ml-2">
+              <Text className="text-danger-dark text-base font-bold ml-2">
                 {t("routineDetail.deleteRoutine")}
               </Text>
             </TouchableOpacity>
@@ -170,9 +193,8 @@ export default function RoutineDetailScreen() {
             {t("routineDetail.noExercises")}
           </Text>
         )}
-        contentContainerClassName="p-6"
+        contentContainerClassName="pl-6 pr-6"
       />
-
       {routine.exercises.length > 0 && (
         <View className="p-6 border-t border-gray-200 bg-background">
           <TouchableOpacity

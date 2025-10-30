@@ -1,14 +1,53 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
+import { useRoutineStore } from "@/src/hooks/useRoutineStore";
+import { ExerciseLog } from "@/src/types/routine";
 
 export default function RoutineCompletedScreen() {
   const { t } = useTranslation();
+  const addWorkoutSession = useRoutineStore((state) => state.addWorkoutSession);
+  const params = useLocalSearchParams<{
+    routineId?: string;
+    routineName?: string;
+    startedAt?: string;
+    completedAt?: string;
+    duration?: string;
+    exercisesLogged?: string;
+  }>();
 
   const handleGoHome = () => {
-    router.replace("/(tabs)");
+    try {
+      const routineId = params.routineId || null;
+      const routineName = params.routineName || "Entrenamiento";
+      const startedAt = params.startedAt || new Date().toISOString();
+      const completedAt = params.completedAt || new Date().toISOString();
+      const duration = parseInt(params.duration || "0", 10);
+      let exercisesLogged: ExerciseLog[] = [];
+      if (params.exercisesLogged) {
+        exercisesLogged = JSON.parse(params.exercisesLogged);
+        if (!Array.isArray(exercisesLogged)) {
+          throw new Error("exercisesLogged no es un array válido.");
+        }
+      }
+      addWorkoutSession({
+        routineId,
+        routineName,
+        startedAt,
+        completedAt,
+        duration,
+        exercisesLogged,
+      });
+      router.replace("/(tabs)");
+    } catch (error) {
+      console.error("Error al guardar la sesión:", error);
+      Alert.alert(
+        t("common.error"),
+        "Hubo un problema al guardar tu sesión. Por favor, inténtalo de nuevo."
+      );
+    }
   };
 
   return (
@@ -23,7 +62,6 @@ export default function RoutineCompletedScreen() {
         <Text className="text-2xl text-white text-center mb-16">
           {t("routineCompleted.message")}
         </Text>
-
         <TouchableOpacity
           onPress={handleGoHome}
           className="bg-card p-4 rounded-full items-center justify-center mt-auto w-full"

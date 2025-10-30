@@ -1,16 +1,19 @@
 import { View } from "react-native";
+import { router } from "expo-router";
 import { useState } from "react";
 import { useRoutineStore } from "@/src/hooks/useRoutineStore";
-import { DaySelector } from "@/src/components/DaySelector";
+import { MultiDaySelector } from "@/src/components/MultiDaySelector";
+import { ScheduleSelector } from "@/src/components/ScheduleSelector";
 import { FormInput } from "@/src/components/FormInput";
 import { useTranslation } from "react-i18next";
 import { ModalFormLayout } from "@/src/components/ModalFormLayout";
-import { router } from "expo-router";
+import { RoutineSchedule } from "@/src/types/routine";
 
 export default function CreateRoutineModal() {
   const { t } = useTranslation();
   const [routineName, setRoutineName] = useState("");
-  const [routineDay, setRoutineDay] = useState("");
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [schedule, setSchedule] = useState<RoutineSchedule>("any");
   const addRoutine = useRoutineStore((state) => state.addRoutine);
 
   const handleSave = () => {
@@ -18,7 +21,7 @@ export default function CreateRoutineModal() {
       alert(t("createRoutine.nameRequiredError"));
       return;
     }
-    addRoutine(routineName, routineDay);
+    addRoutine(routineName, selectedDays, schedule);
     router.back();
   };
 
@@ -35,10 +38,17 @@ export default function CreateRoutineModal() {
           onChangeText={setRoutineName}
           placeholder={t("createRoutine.namePlaceholder")}
         />
-        <DaySelector
-          label={t("createRoutine.dayLabel")}
-          selectedDay={routineDay}
-          onSelectDay={setRoutineDay}
+        <MultiDaySelector
+          label={t("createRoutine.daysLabel")}
+          selectedDays={selectedDays}
+          onSelectionChange={setSelectedDays}
+        />
+        <ScheduleSelector
+          label={
+            t("createRoutine.scheduleLabel") + ` (${t("common.optional")})`
+          }
+          selectedValue={schedule}
+          onValueChange={setSchedule}
         />
       </View>
     </ModalFormLayout>
